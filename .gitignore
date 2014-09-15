@@ -15,5 +15,10 @@
 /log/*.log
 /tmp
 /config/database.yml
-/.idea/
-.idea/workspace.xml
+# Ignore other unneeded files.
+doc/
+*.swp
+*~
+.project
+.DS_Store
+.idea
