@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe User do
-  before { @user = User.new(name: 'Liam Lagay', email: 'liam.lagay@gmail.com', password: 'foobar', password_confirmation: 'foobar') }
+  before { @user = User.create(name: 'Liam Lagay', email: 'liam.lagay@gmail.com', password: 'foobar', password_confirmation: 'foobar') }
 
   subject { @user }
 
@@ -51,7 +51,7 @@ describe User do
   describe 'when email format is invalid' do
     it 'should be invalid' do
       addresses = %w[user@foo,com user_at_foo.org example.user@foo.
-                     foo@bar_baz.com foo@bar+baz.com]
+                     foo@bar_baz.com foo@bar+baz.com, foo@bar..com]
       addresses.each do |invalid_address|
         @user.email = invalid_address
         expect(@user).not_to be_valid
@@ -70,13 +70,14 @@ describe User do
   end
 
   describe 'when email address is already taken' do
+    let(:user_with_duplicate_email) { @user.dup }
+
     before do
-      user_with_duplicate_email = @user.dup
       user_with_duplicate_email.email = @user.email.upcase
       user_with_duplicate_email.save
     end
 
-    it { should_not be_valid }
+    it { expect(user_with_duplicate_email).to_not be_valid }
   end
 
   describe 'return value of authenticate method' do
@@ -97,6 +98,16 @@ describe User do
   describe 'with a password that is too short' do
     before { @user.password = @user.password_confirmation = 'a' * 5 }
     it { expect(@user).not_to be_valid }
+  end
+
+  describe 'when email is mixed case' do
+    let(:user_email_mixed) { 'TeST@eMaIl.COM' }
+
+    it 'should be saved as lowercase' do
+      @user.email = user_email_mixed
+      @user.save
+      expect(@user.reload.email).to eq(user_email_mixed.downcase)
+    end
   end
 
 end
