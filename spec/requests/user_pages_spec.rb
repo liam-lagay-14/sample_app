@@ -19,6 +19,14 @@ describe 'User Pages' do
       it 'should not create a user' do
         expect { click_button submit }.not_to change(User, :count)
       end
+
+      describe 'after submission' do
+        before { click_button submit }
+
+        it { expect(subject).to have_title('Sign Up') }
+        it { expect(subject).to have_content('error') }
+        it { expect(subject).to have_content('The form contains 5 errors')}
+      end
     end
 
     describe 'with valid information' do
@@ -30,6 +38,17 @@ describe 'User Pages' do
       end
       it 'should create a user' do
         expect { click_button submit }.to change(User, :count)
+      end
+
+      describe 'after saving a user' do
+        before { click_button submit }
+
+        let(:user) { User.find_by(email: 'liam.lagay@gmail.com') }
+
+        it { expect(current_path).to eq(user_path(user)) }
+        it { expect(subject).to have_title(user.name) }
+        it { expect(subject).to have_selector('div.alert.alert-success', text: 'Welcome' ) }
+
       end
     end
   end
