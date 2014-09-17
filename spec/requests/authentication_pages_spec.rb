@@ -17,21 +17,18 @@ describe 'Authentication' do
       before { click_button 'Sign in'}
 
       it { expect(subject).to have_title('Sign in') }
-      it { expect(subject).to have_selector('div.alert.alert-danger') }
+      it { expect(subject).to have_error_message('Invalid') }
 
       describe 'after visiting another page' do
         before { click_link "Home" }
-        it { expect(subject).to_not have_selector('div.alert.alert-danger') }
+        it { expect(subject).to_not have_error_message }
       end
     end
 
     describe 'with valid information' do
       let(:user) { FactoryGirl.create(:user) }
-      before do
-        fill_in 'Email', with: user.email.upcase
-        fill_in 'Password', with: user.password
-        click_button 'Sign in'
-      end
+      before { valid_sign_in(user) }
+
       it { expect(subject).to have_title(user.name) }
       it { expect(subject).to have_link('Profile', href: user_path(user)) }
       it { expect(subject).to have_link('Sign out', href: signout_path) }

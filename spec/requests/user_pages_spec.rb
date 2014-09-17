@@ -24,8 +24,7 @@ describe 'User Pages' do
         before { click_button submit }
 
         it { expect(subject).to have_title('Sign Up') }
-        it { expect(subject).to have_content('error') }
-        it { expect(subject).to have_content('The form contains 5 errors')}
+        it { expect(subject).to have_error_message('The form contains 5 errors') }
       end
     end
 
@@ -48,7 +47,7 @@ describe 'User Pages' do
         it { expect(current_path).to eq(user_path(user)) }
         it { expect(subject).to have_link('Sign out')}
         it { expect(subject).to have_title(user.name) }
-        it { expect(subject).to have_selector('div.alert.alert-success', text: 'Welcome' ) }
+        it { expect(subject).to have_success_message('Welcome')}
 
       end
     end
