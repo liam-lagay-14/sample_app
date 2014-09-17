@@ -87,16 +87,34 @@ p {
   }
 }
 
+.nav.pull-right {
+  li {
+    display: inline-block !important;
+    *display: inline !important;
 
+    a {
+      color: #fff;
+    }
+  }
 
-.nav > li {
-  display: inline-block !important;
-  *display: inline !important;
+  .dropdown-menu {
+    li {
+      width: 100%;
+    }
+  }
+
+  #fat-menu {
+    a {
+      color: #000;
+    }
+
+    .dropdown-toggle {
+      color: #fff;
+    }
+  }
 }
 
-.nav > li a {
-  color: #fff;
-}
+
 
 .hero-unit {
   padding: 60px;
@@ -193,6 +211,7 @@ input[type='text'], input[type='password'] {
 
 input[type='submit'] {
   width: 40%;
+  margin-bottom: 10px;
 }
 
 #error-explanation {

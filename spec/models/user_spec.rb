@@ -17,6 +17,8 @@ describe User do
 
   it { expect(@user).to respond_to(:authenticate) }
 
+  it { expect(@user).to respond_to(:remember_token)}
+
 
   it 'should be valid' do
     expect(@user).to be_valid
@@ -108,6 +110,11 @@ describe User do
       @user.save
       expect(@user.reload.email).to eq(user_email_mixed.downcase)
     end
+  end
+
+  describe 'remember me token' do
+    before { @user.save }
+    it { expect(@user.remember_token).to_not be_blank }
   end
 
 end

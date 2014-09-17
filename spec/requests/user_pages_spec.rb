@@ -46,6 +46,7 @@ describe 'User Pages' do
         let(:user) { User.find_by(email: 'liam.lagay@gmail.com') }
 
         it { expect(current_path).to eq(user_path(user)) }
+        it { expect(subject).to have_link('Sign out')}
         it { expect(subject).to have_title(user.name) }
         it { expect(subject).to have_selector('div.alert.alert-success', text: 'Welcome' ) }
 
