@@ -79,7 +79,7 @@ describe 'User Pages' do
         fill_in 'Name', with: new_name
         fill_in 'Email', with: email
         fill_in 'Password', with: user.password
-        fill_in 'Confirm Password', with: user.password
+        fill_in 'Confirmation', with: user.password
         click_button 'Save changes'
       end
 
@@ -88,6 +88,18 @@ describe 'User Pages' do
       it { expect(subject).to have_link('Sign out', href: signout_path) }
       it { expect(user.reload.name).to eq(new_name) }
       it { expect(user.reload.email).to eq(email) }
+    end
+
+    describe 'forbidden attributes' do
+      let(:params) do
+        { user: { admin: true, password: user.password,
+                  password_confirmation: user.password } }
+      end
+      before do
+        valid_sign_in user, no_capybara: true
+        patch user_path(user), params
+      end
+      it { expect(user.reload).to be_admin }
     end
   end
 
@@ -147,6 +159,11 @@ describe 'User Pages' do
           end.to change(User, :count).by(-1)
         end
         it { expect(subject).to_not have_link('delete', href: user_path(:admin)) }
+
+        it 'should not be able to delete itself' do
+          let(:user) { FactoryGirl.create(:user) }
+
+        end
       end
     end
   end
