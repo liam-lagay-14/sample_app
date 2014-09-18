@@ -17,11 +17,15 @@ describe User do
 
   it { expect(@user).to respond_to(:authenticate) }
 
+  it { expect(@user).to respond_to(:admin) }
+
   it { expect(@user).to respond_to(:remember_token)}
 
 
   it 'should be valid' do
     expect(@user).to be_valid
+
+    expect(@user).to_not be_admin
   end
 
   describe 'when name is not present' do
@@ -115,6 +119,15 @@ describe User do
   describe 'remember me token' do
     before { @user.save }
     it { expect(@user.remember_token).to_not be_blank }
+  end
+
+  describe 'with admin attribute set to true' do
+    before do
+      @user.save!
+      @user.toggle(:admin)
+    end
+
+    it { expect(@user).to be_admin }
   end
 
 end
