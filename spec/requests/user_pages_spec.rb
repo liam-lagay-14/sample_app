@@ -105,10 +105,20 @@ describe 'User Pages' do
 
   describe 'profile page' do
     let(:user) { FactoryGirl.create(:user) }
+    let!(:m1) { FactoryGirl.create(:micropost, user: user, content: 'Foo') }
+    let!(:m2) { FactoryGirl.create(:micropost, user: user, content: 'Bar') }
+
     before { visit user_path(user) }
 
     it { expect(subject).to have_content(user.name) }
     it { expect(subject).to have_title(user.name) }
+
+    describe 'microposts' do
+      it { expect(subject).to have_content(m1.content) }
+      it { expect(subject).to have_content(m2.content) }
+      it { expect(subject).to have_content(user.microposts.count) }
+    end
+
   end
 
   describe 'index' do
@@ -159,11 +169,6 @@ describe 'User Pages' do
           end.to change(User, :count).by(-1)
         end
         it { expect(subject).to_not have_link('delete', href: user_path(:admin)) }
-
-        it 'should not be able to delete itself' do
-          let(:user) { FactoryGirl.create(:user) }
-
-        end
       end
     end
   end

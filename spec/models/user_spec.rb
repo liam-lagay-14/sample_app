@@ -5,53 +5,57 @@ describe User do
 
   subject { @user }
 
-  it { expect(@user).to respond_to(:name) }
+  it { expect(subject).to respond_to(:name) }
 
-  it { expect(@user).to respond_to(:email) }
+  it { expect(subject).to respond_to(:email) }
 
-  it { expect(@user).to respond_to(:password_digest) }
+  it { expect(subject).to respond_to(:password_digest) }
 
-  it { expect(@user).to respond_to(:password) }
+  it { expect(subject).to respond_to(:password) }
 
-  it { expect(@user).to respond_to(:password_confirmation) }
+  it { expect(subject).to respond_to(:password_confirmation) }
 
-  it { expect(@user).to respond_to(:authenticate) }
+  it { expect(subject).to respond_to(:authenticate) }
 
-  it { expect(@user).to respond_to(:admin) }
+  it { expect(subject).to respond_to(:admin) }
 
-  it { expect(@user).to respond_to(:remember_token)}
+  it { expect(subject).to respond_to(:microposts) }
+
+  it { expect(subject).to respond_to(:feed) }
+
+  it { expect(subject).to respond_to(:remember_token)}
 
 
   it 'should be valid' do
-    expect(@user).to be_valid
+    expect(subject).to be_valid
 
-    expect(@user).to_not be_admin
+    expect(subject).to_not be_admin
   end
 
   describe 'when name is not present' do
     before { @user.name = '' }
 
-    it { expect(@user).to_not be_valid }
+    it { expect(subject).to_not be_valid }
   end
 
   describe 'when email is not present' do
     before { @user.email = '' }
-    it { expect(@user).to_not be_valid }
+    it { expect(subject).to_not be_valid }
   end
 
   describe 'when password is not present' do
     before { @user.password = '', @user.password_confirmation = '' }
-    it { expect(@user).to_not be_valid }
+    it { expect(subject).to_not be_valid }
   end
 
   describe "when password doesn't match confirmation" do
     before { @user.password_confirmation = 'mismatch' }
-    it { expect(@user).to_not be_valid }
+    it { expect(subject).to_not be_valid }
   end
 
   describe 'when name is too long' do
     before { @user.name = "a" * 51 }
-    it { expect(@user).to_not be_valid }
+    it { expect(subject).to_not be_valid }
   end
 
   describe 'when email format is invalid' do
@@ -60,7 +64,7 @@ describe User do
                      foo@bar_baz.com foo@bar+baz.com, foo@bar..com]
       addresses.each do |invalid_address|
         @user.email = invalid_address
-        expect(@user).not_to be_valid
+        expect(subject).not_to be_valid
       end
     end
   end
@@ -70,7 +74,7 @@ describe User do
       addresses = %w[user@foo.COM A_US-ER@f.b.org frst.lst@foo.jp a+b@baz.cn]
       addresses.each do |valid_address|
         @user.email = valid_address
-        expect(@user).to be_valid
+        expect(subject).to be_valid
       end
     end
   end
@@ -103,7 +107,7 @@ describe User do
 
   describe 'with a password that is too short' do
     before { @user.password = @user.password_confirmation = 'a' * 5 }
-    it { expect(@user).not_to be_valid }
+    it { expect(subject).not_to be_valid }
   end
 
   describe 'when email is mixed case' do
@@ -112,13 +116,13 @@ describe User do
     it 'should be saved as lowercase' do
       @user.email = user_email_mixed
       @user.save
-      expect(@user.reload.email).to eq(user_email_mixed.downcase)
+      expect(subject.reload.email).to eq(user_email_mixed.downcase)
     end
   end
 
   describe 'remember me token' do
     before { @user.save }
-    it { expect(@user.remember_token).to_not be_blank }
+    it { expect(subject.remember_token).to_not be_blank }
   end
 
   describe 'with admin attribute set to true' do
@@ -127,7 +131,32 @@ describe User do
       @user.toggle(:admin)
     end
 
-    it { expect(@user).to be_admin }
+    it { expect(subject).to be_admin }
+  end
+
+  describe 'micropost associations' do
+    before { subject.save }
+    let!(:older_micropost) { FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago ) }
+    let!(:newer_micropost) { FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago) }
+
+    it { expect(subject.microposts.to_a).to eq([newer_micropost, older_micropost]) }
+
+    it 'should destroy associated microposts' do
+      microposts = subject.microposts.to_a
+      @user.destroy
+      expect(microposts).to_not be_empty
+      microposts.each do |micropost|
+        expect(Micropost.where(id: micropost.id)).to be_empty
+      end
+    end
+
+    describe 'status' do
+      let(:unfollowed_post) { FactoryGirl.create(:micropost, user: FactoryGirl.create(:user)) }
+
+      its(:feed) { should include(newer_micropost) }
+      its(:feed) { should include(older_micropost) }
+      its(:feed) { should_not include(unfollowed_post) }
+    end
   end
 
 end

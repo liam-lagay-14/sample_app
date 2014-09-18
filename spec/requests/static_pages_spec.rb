@@ -17,6 +17,22 @@ describe 'Static Pages' do
     it_should_behave_like 'All Static Pages'
 
     it { expect(subject).to_not have_title(full_title('Home')) }
+
+    describe 'for signed-in users' do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user, content: 'Test content 1')
+        FactoryGirl.create(:micropost, user: user, content: 'Test content 2')
+        valid_sign_in user
+        visit root_path
+      end
+
+      it 'should render the users feed' do
+        user.feed.each do |item|
+          expect(subject).to have_selector("li##{item.id}", text: item.content)
+        end
+      end
+    end
   end
 
   describe 'Help Page' do

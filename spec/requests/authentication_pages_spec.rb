@@ -87,6 +87,20 @@ describe 'Authentication' do
             it { expect(subject).to have_title('Sign in')}
           end
         end
+
+        describe 'in the Microposts controller' do
+          describe 'submitting to the create action' do
+            before { post microposts_path }
+            it { expect(response.redirect?).to eq(true) }
+            it { expect(redirect_to_url).to eq(signin_url)}
+          end
+
+          describe 'submitting to the destroy action' do
+            before { delete micropost_path(FactoryGirl.create(:micropost)) }
+            it { expect(response.redirect?).to eq(true) }
+            it { expect(redirect_to_url).to eq(signin_url) }
+          end
+        end
       end
 
       describe 'as the wrong user' do
