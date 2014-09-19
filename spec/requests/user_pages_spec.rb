@@ -118,6 +118,56 @@ describe 'User Pages' do
       it { expect(subject).to have_content(m2.content) }
       it { expect(subject).to have_content(user.microposts.count) }
     end
+
+    describe 'follow/unfollow buttons' do
+      let(:other_user) { FactoryGirl.create(:user) }
+      before { valid_sign_in user }
+
+      describe 'following a user' do
+        before { visit user_path(other_user) }
+
+        it 'should increment the followed users count' do
+          expect do
+            click_button 'Follow'
+          end.to change(user.followed_users, :count).by(1)
+        end
+
+        it 'should increment the other users followed count' do
+          expect do
+            click_button 'Follow'
+          end.to change(other_user.followers, :count).by(1)
+        end
+
+        describe 'toggling the button' do
+          before { click_button 'Follow' }
+          it { expect(subject).to have_xpath("//input[@value='Unfollow']")}
+        end
+      end
+
+      describe 'unfollowing a user' do
+        before do
+          user.follow!(other_user)
+          visit user_path(other_user)
+        end
+
+        it 'should decrease the followed users count' do
+          expect do
+            click_button 'Unfollow'
+          end.to change(user.followed_users, :count).by(-1)
+        end
+
+        it 'should decrease the other users followed count by 1' do
+          expect do
+            click_button 'Unfollow'
+          end.to change(other_user.followers, :count).by(-1)
+        end
+
+        describe 'toggling the button' do
+          before { click_button 'Unfollow' }
+          it { expect(subject).to have_xpath("//input[@value='Follow']")}
+        end
+      end
+    end
   end
 
   describe 'index' do
@@ -168,6 +218,35 @@ describe 'User Pages' do
           end.to change(User, :count).by(-1)
         end
         it { expect(subject).to_not have_link('delete', href: user_path(:admin)) }
+      end
+    end
+
+    describe 'following/followers' do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:other_user) { FactoryGirl.create(:user) }
+
+      before { user.follow!(other_user) }
+
+      describe 'followed users' do
+        before do
+          valid_sign_in user
+          visit following_user_path(user)
+        end
+
+        it { expect(subject).to have_title(full_title('Following')) }
+        it { expect(subject).to have_selector('h3', text: 'Following') }
+        it { expect(subject).to have_link(other_user.name, href: user_path(other_user)) }
+      end
+
+      describe 'followers' do
+        before do
+          valid_sign_in user
+          visit followers_user_path(other_user)
+        end
+
+        it { expect(subject).to have_title(full_title('Followers')) }
+        it { expect(subject).to have_selector('h3', text: 'Followers') }
+        it { expect(subject).to have_link(user.name, href: user_path(user)) }
       end
     end
   end

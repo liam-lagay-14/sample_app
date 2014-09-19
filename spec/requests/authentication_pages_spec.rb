@@ -72,6 +72,16 @@ describe 'Authentication' do
 
         describe 'in the Users controller' do
 
+          describe 'visiting the following page' do
+            before { visit following_user_path(user) }
+            it { expect(subject).to have_title('Sign in') }
+          end
+
+          describe 'visiting the followers page' do
+            before { visit followers_user_path(user) }
+            it { expect(subject).to have_title('Sign in') }
+          end
+
           describe 'visiting the edit page' do
             before { visit edit_user_path(user) }
             it { expect(subject).to have_title('Sign in') }
@@ -88,6 +98,20 @@ describe 'Authentication' do
           end
         end
 
+        describe 'in the Relationships controller' do
+          describe 'submitting to the create action' do
+            before { post relationships_path }
+            it { expect(response.redirect?).to eq(true) }
+            it { expect(redirect_to_url).to eq(signin_url)}
+          end
+
+          describe 'submitting to the destroy action' do
+            before { delete relationship_path(1) }
+            it { expect(response.redirect?).to eq(true) }
+            it { expect(redirect_to_url).to eq(signin_url) }
+          end
+        end
+
         describe 'in the Microposts controller' do
           describe 'submitting to the create action' do
             before { post microposts_path }
@@ -101,6 +125,8 @@ describe 'Authentication' do
             it { expect(redirect_to_url).to eq(signin_url) }
           end
         end
+
+
       end
 
       describe 'can not delete other users posts' do

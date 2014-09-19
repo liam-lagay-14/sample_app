@@ -187,6 +187,34 @@ aside {
   }
 }
 
+.stats {
+  overflow: auto;
+  a {
+    float:left;
+    padding: 0 10px;
+    border-left: 1px solid $lightGray;
+    color: #808080;
+    &:first-child {
+      padding-left: 0;
+      border: 0;
+    }
+    &:hover {
+      text-decoration: none;
+      color: #0000ff;
+    }
+  }
+  strong {
+    display: block;
+  }
+}
+
+.user_avatars {
+  img {
+    margin-right: 3px;
+    margin-top: 10px;
+  }
+}
+
 .gravatar {
   float:left;
   margin-right: 10px;
@@ -288,3 +316,6 @@ input[type='submit'] {
   /* not normally good practice, but necessary in this case */
   margin-top: -3px;
 }
+
+
+
