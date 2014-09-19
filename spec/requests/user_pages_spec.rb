@@ -118,7 +118,6 @@ describe 'User Pages' do
       it { expect(subject).to have_content(m2.content) }
       it { expect(subject).to have_content(user.microposts.count) }
     end
-
   end
 
   describe 'index' do

@@ -32,6 +32,19 @@ describe 'Static Pages' do
           expect(subject).to have_selector("li##{item.id}", text: item.content)
         end
       end
+
+      it { expect(subject).to have_content('2 microposts') }
+
+      describe 'for signed-in users with a single micropost' do
+        let(:second_user) { FactoryGirl.create(:user, email: 'Billbob@email.com') }
+        before do
+          FactoryGirl.create(:micropost, user: second_user, content: 'Test content for Bill bob')
+          valid_sign_in second_user
+          visit root_path
+        end
+
+        it { expect(subject).to have_content('1 micropost') }
+      end
     end
   end
 
@@ -73,4 +86,17 @@ describe 'Static Pages' do
     click_link "sample app"
     expect(page).to have_title(full_title(''))
   end
+
+  describe 'micropost pagination' do
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      31.times { FactoryGirl.create(:micropost, user: user) }
+      valid_sign_in user
+      visit root_path
+    end
+    after { user.microposts.destroy_all }
+    it { expect(subject).to have_selector('div.pagination')}
+  end
 end
+
+

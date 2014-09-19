@@ -280,3 +280,11 @@ input[type='submit'] {
     }
   }
 }
+
+.countdown_indicator {
+  color: $lightGray;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  /* not normally good practice, but necessary in this case */
+  margin-top: -3px;
+}

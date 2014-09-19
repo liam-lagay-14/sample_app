@@ -103,6 +103,12 @@ describe 'Authentication' do
         end
       end
 
+      describe 'can not delete other users posts' do
+        let(:invalid_user) { FactoryGirl.create(:user) }
+        before { visit user_path(invalid_user) }
+        it { expect(subject).to_not have_link('delete')}
+      end
+
       describe 'as the wrong user' do
         let(:user) { FactoryGirl.create(:user) }
         let(:wrong_user) { FactoryGirl.create(:user, email: 'wrong@example.com') }
