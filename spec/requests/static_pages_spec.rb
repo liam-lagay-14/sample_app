@@ -59,6 +59,18 @@ describe 'Static Pages' do
     end
   end
 
+  describe 'Profile Page' do
+    let(:user) { FactoryGirl.create(:user) }
+    let(:other_user) { FactoryGirl.create(:user) }
+    before do
+      other_user.follow!(user)
+      visit user_path(user)
+    end
+
+    it { expect(subject).to have_link('0 following', href: following_user_path(user)) }
+    it { expect(subject).to have_link('1 followers', href: followers_user_path(user)) }
+  end
+
   describe 'Help Page' do
     before { visit help_path }
     let(:heading) { 'Help' }

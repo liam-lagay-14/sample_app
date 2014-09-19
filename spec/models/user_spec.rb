@@ -203,6 +203,15 @@ describe User do
       subject { other_user }
       its(:followers) { should include(@user) }
     end
+
+    it 'should destroy associated follower relationships' do
+      followers = @user.relationships.to_a
+      @user.destroy
+      expect(followers).to_not be_empty
+      followers.each do |follower|
+        expect(Relationship.where(follower_id: follower.id)).to be_empty
+      end
+    end
   end
 
 end
